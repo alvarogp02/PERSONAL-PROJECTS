@@ -8,9 +8,9 @@ Este repositorio está en proceso de crecimiento y actualización. Actualmente, 
 
 ## Estructura del Repositorio
 
-- 'clasificador-pez-payaso-o-tropical': Proyecto de clasificación de peces tropicales vs. peces payaso.
-- 'clasificador_cancer_de_mama': Proyecto de clasificacion de casos de cáncer de mama vs sanos.
-- 'comparación de modelos para estudio de cáncer de mama': modelo e informe.
+- `clasificador-pez-payaso-o-tropical`: Proyecto de clasificación de peces tropicales vs. peces payaso.
+- `clasificador_cancer_de_mama`: Proyecto de clasificacion de casos de cáncer de mama vs sanos.
+- `comparación de modelos para estudio de cáncer de mama`: modelo e informe.
 
 
 ## Contribuciones
