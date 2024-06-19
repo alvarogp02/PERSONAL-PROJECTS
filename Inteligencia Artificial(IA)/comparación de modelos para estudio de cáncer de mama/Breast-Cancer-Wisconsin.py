@@ -1,16 +1,14 @@
-import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
+from sklearn.discriminant_analysis import StandardScaler
+from sklearn.metrics import accuracy_score, auc, roc_curve, precision_score, recall_score, f1_score, confusion_matrix, roc_auc_score
+from sklearn.model_selection import GridSearchCV, StratifiedKFold, cross_val_score, train_test_split
 from sklearn.naive_bayes import GaussianNB
-from sklearn.preprocessing import LabelEncoder
 from sklearn.neighbors import KNeighborsClassifier
-import matplotlib.pyplot as plt
-from sklearn.model_selection import StratifiedKFold, cross_val_score
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score, roc_curve, precision_score, recall_score, f1_score, confusion_matrix, roc_auc_score
-from sklearn.model_selection import GridSearchCV
-from sklearn.tree import plot_tree
+from sklearn.preprocessing import LabelEncoder
 from sklearn.svm import SVC 
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 
 # Especifica la ruta del archivo descargado
 ruta_archivo = "wdbc.data"
@@ -31,116 +29,71 @@ df = df.drop(['ID'], axis=1)
 # Diagnosis tiene valores 'String', usamos labelEncoder() para asignar 1 a M y 0 a B
 le = LabelEncoder()
 df['Diagnosis'] = le.fit_transform(df['Diagnosis'])
-
-caracteristicas_columnas = ['radius_mean','texture_mean','perimeter_mean','area_mean','smoothness_mean','compactness_mean','concavity_mean','concave_points_mean',
-                    'symmetry_mean','fractal_dimension_mean','radius_se','texture_se','perimeter_se','area_se','smoothness_se','compactness_se','concavity_se',
-                    'concave_points_se','symmetry_se','fractal_dimension_se','radius_worst','texture_worst','perimeter_worst','area_worst','smoothness_worst','compactness_worst',
-                    'concavity_worst','concave_points_worst','symmetry_worst','fractal_dimension_worst'
-                    ]
-
-X = df[caracteristicas_columnas]
+X = df.drop("Diagnosis", axis = 1)
 y = df['Diagnosis']
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
+# Escalado de características
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3, random_state=0)
 
 
-# Inicializamos diccionario para almacenar métricas
-metrics_dict = {}
+# Función para graficar curvas ROC
+def plot_roc_curve(model, X, y, label):
+    y_proba = model.predict_proba(X)[:, 1]
+    fpr, tpr, _ = roc_curve(y, y_proba)
+    roc_auc = auc(fpr, tpr)
+    plt.plot(fpr, tpr, label=f'{label} (AUC = {roc_auc:.3f})')
+    plt.plot([0, 1], [0, 1], 'k--')
+    plt.xlim([-0.05, 1.05])
+    plt.ylim([-0.05, 1.05])
+    plt.xlabel('Tasa de falsos positivos')
+    plt.ylabel('Tasa de verdaderos positivos')
+    plt.title(f'Curva ROC - {label}')
+    plt.legend(loc='lower right')
+    plt.show()
 
-
+# Función para obtener parámetros curvas ROC
+def all_roc_curve(model, X, y, label):
+    y_proba = model.predict_proba(X)[:, 1]
+    fpr, tpr, _ = roc_curve(y, y_proba)
+    roc_auc = auc(fpr, tpr)
+    return fpr, tpr, roc_auc
 
 
 
 
 # Clasificador Naive Bayes
 estimador_gnb = GaussianNB()
-y_pred_train = estimador_gnb.fit(X_train, y_train).predict(X_train)
-y_pred_test = estimador_gnb.predict(X_test)
-accuracy_train = accuracy_score(y_train, y_pred_train)
-accuracy_test = accuracy_score(y_test, y_pred_test)
-precision_train = precision_score(y_train, y_pred_train)
-precision_test = precision_score(y_test, y_pred_test)
-recall_train = recall_score(y_train, y_pred_train)
-recall_test = recall_score(y_test, y_pred_test)
-f1_train = f1_score(y_train, y_pred_train)
-f1_test = f1_score(y_test, y_pred_test)
-metrics_dict['GaussianNB'] = {'Train Accuracy': accuracy_train, 'Test Accuracy': accuracy_test, 'Train Precision': precision_train, 'Test Precision': precision_test, 'Train Recall': recall_train, 'Test Recall': recall_test, 'Train F1-Score': f1_train, 'Test F1-Score': f1_test}
-print("\nClasificador Naive Bayes")
-print("Exactitud(train): ", accuracy_train)
-print("Exactitud(test): ", accuracy_test)
-print("Precision(train): ", precision_train)
-print("Precision(test): ", precision_test)
-print("Recall(train): ", recall_train)
-print("Recall(test): ", recall_test)
-print("F1-Score(train): ", f1_train)
-print("F1-Score(test): ", f1_test)
+puntuaciones_gnb = cross_val_score(estimador_gnb, X_scaled, y, cv=10, scoring='accuracy')
+print("--> Naive Bayes")
+print("Exactitud: ", puntuaciones_gnb.mean())
 
-
-
-
-
-
-
-
-
-# Clasificador Nearest Neighbors
-estimador_neigh = KNeighborsClassifier(n_neighbors=5)
-estimador_neigh.fit(X_train,y_train)
-
-#print(estimador_neigh.predict(X_test),'\n')
-
-
-predict_proba_df = pd.DataFrame(X_test, columns=caracteristicas_columnas)
-#print(estimador_neigh.predict_proba(predict_proba_df))
-
-# Definimos lista de números de vecinos a probar
-neighbors_list = range(1, 31)
-cv_NN = []
-stratified_kfold = StratifiedKFold(n_splits=10, shuffle=True, random_state=30)
-
-# Realizar la validación cruzada estratificada 10-fold para cada número de vecinos
-for k in neighbors_list:
-    kn = KNeighborsClassifier(n_neighbors=k)
-    res = cross_val_score(kn, X_train, y_train, cv=stratified_kfold, scoring='accuracy')
-    cv_NN.append(res.mean())
-
-# Encontrar el mejor número de vecinos a partir de mayor valor de cv
-bestK = neighbors_list[np.argmax(cv_NN)]
-print("\nClasificador Nearest Neighbors")
-print("El mejor número de vecinos es:", bestK)
-
-# Creamos gráfica
+# Curve ROC
+estimador_gnb.fit(X_train, y_train)
 plt.figure(figsize=(10, 10))
-plt.plot(neighbors_list, cv_NN)
-plt.title('Precisión(media) vs. Número de Vecinos')
-plt.xlabel('Número de Vecinos')
-plt.ylabel('Precisión')
-plt.xticks(neighbors_list)
-plt.grid(True)
-plt.show()
+plot_roc_curve(estimador_gnb, X_test, y_test, 'Naive Bayes')
 
-# Calcular las métricas adicionales
-y_pred_train = estimador_neigh.predict(X_train)
-y_pred_test = estimador_neigh.predict(X_test)
-accuracy_train = accuracy_score(y_train, y_pred_train)
-accuracy_test = accuracy_score(y_test, y_pred_test)
-precision_train = precision_score(y_train, y_pred_train)
-precision_test = precision_score(y_test, y_pred_test)
-recall_train = recall_score(y_train, y_pred_train)
-recall_test = recall_score(y_test, y_pred_test)
-f1_train = f1_score(y_train, y_pred_train)
-f1_test = f1_score(y_test, y_pred_test)
-print("Exactitud(train):", accuracy_train)
-print("Exactitud(test):", accuracy_test)
-print("Precision(train):", precision_train)
-print("Precision(test):", precision_test)
-print("Recall(train):", recall_train)
-print("Recall(test):", recall_test)
-print("F1-Score(train):", f1_train)
-print("F1-Score(test):", f1_test)
 
-# Guardar las métricas en el diccionario
-metrics_dict['KNeighborsClassifier'] = {'Train Accuracy': accuracy_train, 'Test Accuracy': accuracy_test, 'Train Precision': precision_train, 'Test Precision': precision_test, 'Train Recall': recall_train, 'Test Recall': recall_test, 'Train F1-Score': f1_train, 'Test F1-Score': f1_test}
+
+
+
+
+# Clasificador K-Nearest Neighbors
+estimador_neigh = KNeighborsClassifier()
+param_neigh = {'n_neighbors': range(1, 31)}
+estimador_neigh_search = GridSearchCV(estimador_neigh, param_neigh, cv=10, scoring='accuracy')
+estimador_neigh_search.fit(X_scaled, y)
+print("--> Mejor K-Nearest Neighbors: ")
+print("Parámetros: ", estimador_neigh_search.best_params_)
+print("Exactitud: ", estimador_neigh_search.best_score_)
+
+# Curve ROC
+best_knn = estimador_neigh_search.best_estimator_
+best_knn.fit(X_train, y_train)
+plt.figure(figsize=(10, 10))
+plot_roc_curve(best_knn, X_test, y_test, 'K-Nearest Neighbors')
 
 
 
@@ -151,149 +104,69 @@ metrics_dict['KNeighborsClassifier'] = {'Train Accuracy': accuracy_train, 'Test 
 
 
 # Clasificador de árbol de decisión
-estimador_arbol = DecisionTreeClassifier(max_depth=6, min_samples_leaf=10, min_samples_split=3, random_state=30)
+estimador_arbol = DecisionTreeClassifier()
+param_grid_dt = {'max_depth': range(1, 31), 'min_samples_split': range(2, 11)}
+grid_search_dt = GridSearchCV(estimador_arbol, param_grid_dt, cv=10, scoring='accuracy')
+grid_search_dt.fit(X_scaled, y)
+print("--> Mejor decision tree: \n")
+print("Parámetros: ",grid_search_dt.best_params_)
+print("Exactitud: ",grid_search_dt.best_score_)
 
-# Entrenar el clasificador
-estimador_arbol.fit(X_train, y_train)
+# Curve ROC
+best_dt = grid_search_dt.best_estimator_
+best_dt.fit(X_train,y_train)
+plt.figure(figsize=(10, 10))
+plot_roc_curve(best_dt, X_test, y_test, 'Decision Tree')
 
-# Predecir las etiquetas de los datos de entrenamiento y prueba
-y_pred_train = estimador_arbol.predict(X_train)
-y_pred_test = estimador_arbol.predict(X_test)
-
-# Calcular la precisión para los datos de entrenamiento y prueba
-accuracy_train = accuracy_score(y_train, y_pred_train)
-accuracy_test = accuracy_score(y_test, y_pred_test)
-
-# Calcular las métricas adicionales para los datos de entrenamiento y prueba
-precision_train = precision_score(y_train, y_pred_train)
-precision_test = precision_score(y_test, y_pred_test)
-recall_train = recall_score(y_train, y_pred_train)
-recall_test = recall_score(y_test, y_pred_test)
-f1_train = f1_score(y_train, y_pred_train)
-f1_test = f1_score(y_test, y_pred_test)
-print("\nClasificador de árbol de decisión")
-print("Exactitud(train): ", accuracy_train)
-print("Exactitud(test): ", accuracy_test)
-print("Precision(train): ", precision_train)
-print("Precision(test): ", precision_test)
-print("Recall(train): ", recall_train)
-print("Recall(test): ", recall_test)
-print("F1-Score(train): ", f1_train)
-print("F1-Score(test): ", f1_test, "\n")
-
-# max_depth es la profundidad máxima del árbol
-# min_samples_split es el número mínimo de muestras necesarias para dividir un nodo interno
-# min_samples_leaf es el número mínimo de muestras necesarias para estar en un nodo hoja(dejo provisional a 4 sera 12)
-param_grid = {'max_depth': range(1, 10),
-              'min_samples_split': range(2, 10),
-              'min_samples_leaf': range(1, 10)}
-
-# Creo el objeto GridSearchCV
-grid_searchcv = GridSearchCV(estimador_arbol, param_grid, cv=10)
-grid_searchcv.fit(X, y)
-
-# Imprimir los mejores hiperparámetros
-print("Parámetros ideales para árbol: ", grid_searchcv.best_params_)
-
-# Obtener el mejor modelo de GridSearchCV y hacer gráfica
-best_decision_tree = grid_searchcv.best_estimator_
-plt.figure(figsize=(12, 10))
-plot_tree(best_decision_tree, feature_names=caracteristicas_columnas, class_names=['Benigno', 'Maligno'], filled=True)
+# Árbol de decisión
+plt.figure(figsize=(15,10))
+plot_tree(best_dt, 
+               filled=True, 
+               rounded=True, 
+               class_names=['Benign', 'Malignant'],
+               feature_names=X.columns)
+plt.title("Decision Tree")
 plt.show()
-
-# Guardar las métricas en el diccionario
-metrics_dict['DecisionTreeClassifier'] = {'Train Accuracy': accuracy_train, 'Test Accuracy': accuracy_test, 'Train Precision': precision_train, 'Test Precision': precision_test, 'Train Recall': recall_train, 'Test Recall': recall_test, 'Train F1-Score': f1_train, 'Test F1-Score': f1_test}
-
-
-
-
 
 
 
 
 
 # Clasificador Support Vector Machine
-estimador_svc = SVC()
+estimador_svc = SVC(probability=True)
+param_grid_svm = {'kernel': ['linear', 'rbf','sigmoid'], 'C': [0.1, 1, 10], 'gamma': ['scale', 'auto']}
+grid_search_svm = GridSearchCV(estimador_svc, param_grid_svm, cv=10, scoring='accuracy')
+grid_search_svm.fit(X_scaled, y)
+print("--> Mejor Support Vector Machine: ")
+print("Parámetros: ", grid_search_svm.best_params_)
+print("Exactitud: ", grid_search_svm.best_score_)
 
-# Entrenar el clasificador
-estimador_svc.fit(X_train, y_train)
+# Curve ROC
+best_svm = grid_search_svm.best_estimator_
+best_svm.fit(X_train,y_train)
+plt.figure(figsize=(10, 10))
+plot_roc_curve(best_svm, X_test, y_test, 'Support Vector Machine')
 
-# Predecir las etiquetas de los datos de entrenamiento y prueba
-y_pred_train = estimador_svc.predict(X_train)
-y_pred_test = estimador_svc.predict(X_test)
+# Comparar todas las curvas ROC juntas
+fpr_gnb, tpr_gnb, roc_auc_gnb = all_roc_curve(estimador_gnb, X_test, y_test, 'Naive Bayes')
+fpr_knn, tpr_knn, roc_auc_knn = all_roc_curve(best_knn, X_test, y_test, 'K-Nearest Neighbors')
+fpr_dt, tpr_dt, roc_auc_dt = all_roc_curve(best_dt, X_test, y_test, 'Decision Tree')
+fpr_svm, tpr_svm, roc_auc_svm = all_roc_curve(best_svm, X_test, y_test, 'Support Vector Machine')
 
-# Calcular la precisión para los datos de entrenamiento y prueba
-accuracy_train = accuracy_score(y_train, y_pred_train)
-accuracy_test = accuracy_score(y_test, y_pred_test)
-
-# Calcular las métricas adicionales para los datos de entrenamiento y prueba
-precision_train = precision_score(y_train, y_pred_train)
-precision_test = precision_score(y_test, y_pred_test)
-recall_train = recall_score(y_train, y_pred_train)
-recall_test = recall_score(y_test, y_pred_test)
-f1_train = f1_score(y_train, y_pred_train)
-f1_test = f1_score(y_test, y_pred_test)
-print("\nClasificador Support Vector Machine")
-print("Exactitud(train): ", accuracy_train)
-print("Exactitud(test): ", accuracy_test)
-print("Precision(train): ", precision_train)
-print("Precision(test): ", precision_test)
-print("Recall(train): ", recall_train)
-print("Recall(test): ", recall_test)
-print("F1-Score(train): ", f1_train)
-print("F1-Score(test): ", f1_test)
-
-# Definir los parámetros para la búsqueda en malla
-param_grid = {'C': [0.1, 1], 
-              'gamma': [1, 0.1],
-              'kernel': ['rbf', 'linear', 'sigmoid']}
-
-# Crear el objeto GridSearchCV con validación cruzada estratificada
-grid_search = GridSearchCV(SVC(), param_grid, cv=StratifiedKFold(n_splits=10, shuffle=True, random_state=30))
-
-# Ajustar el modelo a los datos de entrenamiento
-grid_search.fit(X_train, y_train)
-
-# Imprimir los mejores hiperparámetros encontrados
-print("Mejores parámetros para SVM: ", grid_search.best_params_)
-
-# Guardar las métricas en el diccionario
-metrics_dict['SVC'] = {'Train Accuracy': accuracy_train, 'Test Accuracy': accuracy_test, 'Train Precision': precision_train, 'Test Precision': precision_test, 'Train Recall': recall_train, 'Test Recall': recall_test, 'Train F1-Score': f1_train, 'Test F1-Score': f1_test}
-
-
-
-
-# Definir nombres y clasificadores
-names = ['Naive Bayes', 'K-Nearest Neighbors', 'Decision Tree', 'Support Vector Machine']
-classifiers = [GaussianNB(), 
-               KNeighborsClassifier(n_neighbors=5), 
-               DecisionTreeClassifier(max_depth=6, min_samples_leaf=10, min_samples_split=3, random_state=30), 
-               SVC(probability=True)]  
-
-
-
-plt.figure()
-
-for name, classifier in zip(names, classifiers):
-    # Entrenar el clasificador
-    classifier.fit(X_train, y_train)
-
-    # Predecir las etiquetas de los datos de prueba
-    y_pred = classifier.predict(X_test)
-
-    # Calcular los valores de fpr, tpr y umbral para la curva ROC
-    fpr, tpr, _ = roc_curve(y_test, y_pred)
-
-    # Calcular el área bajo la curva ROC (AUC)
-    roc_auc = roc_auc_score(y_test, y_pred)
-
-    # Graficar la curva ROC para cada clasificador
-    plt.plot(fpr, tpr, label=f'{name} (AUC = {roc_auc:.2f})')
-
-# Configurar y mostrar la gráfica
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('Curva ROC')
-plt.legend()
+# Graficar todas las curvas ROC juntas
+print("--> Comparación Curvas ROC: ")
+plt.figure(figsize=(10, 10))
+plt.plot(fpr_gnb, tpr_gnb, label=f'Naive Bayes (AUC = {roc_auc_gnb:.3f})')
+plt.plot(fpr_knn, tpr_knn, label=f'K-Nearest Neighbors (AUC = {roc_auc_knn:.3f})')
+plt.plot(fpr_dt, tpr_dt, label=f'Decision Tree (AUC = {roc_auc_dt:.3f})')
+plt.plot(fpr_svm, tpr_svm, label=f'Support Vector Machine (AUC = {roc_auc_svm:.3f})')
+plt.plot([0, 1], [0, 1], 'k--')
+plt.xlim([-0.05, 1.05])
+plt.ylim([-0.05, 1.05])
+plt.xlabel('Tasa de falsos positivos')
+plt.ylabel('Tasa de verdaderos positivos')
+plt.title('Comparación de curvas ROC')
+plt.legend(loc='lower right')
 plt.show()
+
 
