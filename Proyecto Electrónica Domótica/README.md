@@ -1,6 +1,6 @@
 # Proyecto de Domótica
 
-Este proyecto fue realizado en la asignatura de 'Electrónica Domótica', partiendo de la base ofrecida por jcTejero. El objetivo principal es el desarrollo de un sistema domótico utilizando el módulo Arduino UNO como controlador, una aplicación Java como interfaz, y el protocolo ModBus para la comunicación entre Java y Arduino.
+Este proyecto fue realizado en la asignatura de 'Electrónica Domótica'. El objetivo principal es el desarrollo de un sistema domótico utilizando el módulo Arduino UNO como controlador, una aplicación Java como interfaz, y el protocolo ModBus para la comunicación entre Java y Arduino.
 
 ## Implementaciones
 
@@ -9,7 +9,7 @@ El proyecto incluye las siguientes funcionalidades:
 1. **Activación de un RELÉ**: Control de dispositivos mediante un relé.
 2. **Activación de un TRIAC**: Control de dispositivos mediante un TRIAC.
 3. **Protocolo ModBus**: Implementación del protocolo ModBus y modificación de la aplicación para enviar y recibir tramas.
-4. **Sensor de Movimiento (PIR)**: Detección de movimiento utilizando un sensor PIR.
+4. **Sensor de Movimiento(PIR)**: Detección de movimiento utilizando un sensor PIR.
 5. **Memoria EEPROM**: Uso de la memoria EEPROM del Arduino para el almacenamiento de parámetros.
 6. **Potenciómetros**: Lectura y uso de potenciómetros para diversos controles.
 7. **Fotorresistencia**: Utilizada para detectar cambios en la intensidad lumínica y activar un relé para un sistema de iluminación automática.
