@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-15">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JSSC"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/CommTransport"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/myModBus"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SteelSeries"/>
+	<classpathentry kind="lib" path="C:/Users/Usuario/Downloads/trident-7.3/trident-7.3/trident-7.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Usuario/Downloads/trident-7.3/trident-7.3/trident-7.3-javadoc.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Usuario/Downloads/trident-7.3/trident-7.3/trident-7.3-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Usuario/Downloads/steelseries-3.9.31.2/steelseries-3.9.31.2/SteelSeries-3.9.31.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Usuario/Downloads/steelseries-3.9.31.2/steelseries-3.9.31.2/SteelSeries-3.9.31.2-javadoc.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Usuario/Downloads/steelseries-3.9.31.2/steelseries-3.9.31.2/SteelSeries-3.9.31.2-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Usuario/Downloads/myModBus.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Usuario/Downloads/CommTransport.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Usuario/Downloads/slf4j-api-2.0.12.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Usuario/Downloads/native-lib-loader-2.5.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Usuario/Downloads/jssc-2.9.6.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Usuario/Downloads/jssc-2.9.6-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Usuario/Downloads/jssc-2.9.6-javadoc.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
