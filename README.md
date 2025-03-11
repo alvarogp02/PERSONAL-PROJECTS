@@ -27,7 +27,7 @@ Este repositorio está en proceso de crecimiento y actualización. Actualmente, 
 Ejercicios y proyectos prácticos relacionados con la manipulación y análisis de imágenes y vídeo usando MATLAB.
 
 ### 4. Bases de Datos y Almacenes de Datos
-Proyectos relacionados con la creación y gestión de bases de datos, incluyendo:
+Proyectos relacionados con la creación y gestión de bases y almacenes de datos, incluyendo la creación de un almacén de datos desde 0 a partir de una bbdd clínica **EICU Colaborative Research Database** pero considerando únicamente aquellos pacientes ingresados en UCI por problemas cardiovasculares. Mediante los hitos:
 - Modelos físicos y lógicos.
 - Procesos ETL.
 - Creación de cubos MOLAP y consultas MDX.
