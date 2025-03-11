@@ -16,12 +16,12 @@ Este repositorio está en proceso de crecimiento y actualización. Actualmente, 
 ### Domótica
 - `sistema_domótico_ardC`: Implementaciones del proyecto Domótica realizadas en C usando arduino.
 - `sistema_domótico_java`: Implementaciones del proyecto Domótica realizadas en java.
-- **clasificador_cancer_de_mama:** Proyecto de clasificación de casos de cáncer de mama vs. sanos.
-- **comparación de modelos para estudio de cáncer de mama:** Modelo e informe de análisis comparativo de distintos clasificadores.
+- `clasificador_cancer_de_mama`: Proyecto de clasificación de casos de cáncer de mama vs. sanos.
+- `comparación de modelos para estudio de cáncer de mama`: Modelo e informe de análisis comparativo de distintos clasificadores.
 
 ### 2. Domótica
-- **sistema_domótico_ardC:** Implementaciones del proyecto de domótica realizadas en C usando Arduino.
-- **sistema_domótico_java:** Implementaciones del proyecto de domótica realizadas en Java.
+- `sistema_domótico_ardC`: Implementaciones del proyecto de domótica realizadas en C usando Arduino.
+- `sistema_domótico_java`: Implementaciones del proyecto de domótica realizadas en Java.
 
 ### 3. Procesamiento de Imágenes y Vídeo
 Ejercicios y proyectos prácticos relacionados con la manipulación y análisis de imágenes y vídeo usando MATLAB.
