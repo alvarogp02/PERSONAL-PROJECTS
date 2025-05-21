@@ -1,0 +1,236 @@
+---
+title: "Análisis de Redes Sociales - USairports "
+author:
+- affiliation: Laboratorio de Computación Científica - Universidad de Málaga 
+  name: Álvaro
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+<!-- para colocar una imagen -->
+<!-- ![](redes.png) -->
+
+```{r}
+library(igraph)
+library(igraphdata)
+```
+
+ 
+# Ejercicio
+
+ 
+Nota: Buscar información en   [https://igraph.org/r/](https://igraph.org/r/)  si hay algún comando que **no conoces**.
+
+Cargamos la librería **igraphdata** y el dataset  **USairports**. 
+
+1. Visualizar el grafo.
+
+```{r}
+data("USairports")
+plot(USairports)
+```
+
+2. Calcula número de aeropuertos.
+
+```{r}
+vcount(USairports)
+```
+
+3. Calcula número de enlaces (vuelos).
+```{r}
+ecount(USairports)
+```
+
+
+4. Mostrar los cinco primeros vértices. Usar función ``V`` para acceder a los vértices del grafo. 
+
+```{r}
+V(USairports)[1:5]
+```
+
+
+5. Mira las propiedades asociadas a los vértices ``vertex_attr_names``, ``vertex_attr``. 
+
+```{r}
+vertex_attr_names(USairports)
+```
+
+
+6. ¿Qué vértice tiene como nombre "BOS"? ¿Qué atributos aparecen en ese vértice?
+
+```{r}
+indice <- which(V(USairports)$name == "BOS")
+V(USairports)[indice]$name
+V(USairports)[indice]$City
+V(USairports)[indice]$Position
+
+```
+
+
+7. Visualizar los cinco primeros arcos. Usar función ``E`` para acceder a los arcos del grafo. 
+
+```{r}
+E(USairports)[1:5]
+```
+
+
+8. Visualizar 5 primeros arcos.  Para el arco 5 visualiza todos los metadatos que tiene dicho arco. 
+
+```{r}
+E(USairports)[1:5]
+edge_attr_names(USairports) # para ver todos los disponibles
+E(USairports)[5]
+
+E(USairports)[5]$Carrier
+E(USairports)[5]$Departures
+E(USairports)[5]$Seats
+E(USairports)[5]$Passengers
+E(USairports)[5]$Aircraft
+E(USairports)[5]$Distance
+```
+
+
+
+9. En los 20 primeros arcos muestra cuales contienen en atributo "Carrier" la cadena "Airlines".
+
+
+```{r}
+carriers <- E(USairports)[1:20]$Carrier
+indices <- grep("Airlines",carriers)
+E(USairports)[indices]
+```
+
+10. En los 20 primeros vértices muestra cuales contienen en atributo "City" la cadena "Angeles".
+```{r}
+cities <- V(USairports)[1:20]$City
+indices <- grep("Angeles",cities)
+V(USairports)[indices]
+```
+
+
+11. Usando los metadatos, muestra en una tabla,   los nombres de los 5 primeros aeropuertos,  de sus ciudades, y la posición. 
+
+```{r}
+vertex_attr_names(USairports)
+table11 <- data.frame(
+  Name = V(USairports)$name[1:5],
+  City = V(USairports)$City[1:5],
+  Position = V(USairports)$Position[1:5]
+)
+table11
+```
+
+12. En los arcos el metadato "Departures" almacena número de salidas entre los vértices del arco. Obtén el arco con mayor número de salidas. 
+
+```{r}
+indice <- which.max(E(USairports)$Departures)
+E(USairports)[indice]
+```
+
+13. En el nombre de aeropuerto ("name"), busca qué aeropuerto contiene cadena "JF". Y di qué ciudad es ("City").  
+
+```{r}
+indice <- grep("JF",V(USairports)$name)
+V(USairports)[indice]$City
+```
+
+14. Calcula el grado de cada vértice de  la red. 
+
+```{r}
+degree(USairports)
+
+# degree(USairports,mode = "in") # numero de vértices de entrada a cada vértice
+# degree(USairports,mode = "out") # numero de vértices de salida a cada vértice
+
+
+```
+
+15. Para la ciudad que contiene "Kahului", di cuantas conexiones (vuelos) totales hay (de entrada y salida). ¿Cuántas conexiones hay de llegada? ¿cuántas conexiones hay de salida? 
+
+```{r}
+indice <- grep("Kahului",V(USairports)$City)
+totales <- degree(USairports, v = V(USairports)[indice], mode = "all")
+in_deg  <- degree(USairports, v = V(USairports)[indice], mode = "in")
+out_deg <- degree(USairports, v = V(USairports)[indice], mode = "out")
+totales
+in_deg
+out_deg
+
+```
+
+16. Guarda los índices de los vértices ordenados por grado de forma decreciente. 
+Muestra los 10 aeropuertos (vértices que tienes más conexiones - grado mayor)
+
+
+```{r}
+indices <- order(degree(USairports),decreasing = TRUE)
+V(USairports)[indices][1:10]
+```
+
+17. Muestra los 10 aeropuertos con más conexiones de salida (vértices que tienes más conexiones de salida - grado mayor de salida). 
+
+```{r}
+indices <- order(degree(USairports,mode = "out"),decreasing = TRUE)
+V(USairports)[indices][1:10]
+```
+
+18. ¿Qué vertice/s tiene en su nombre "Vegas"?
+
+```{r}
+indices <- grep("Vegas", V(USairports)$City)
+V(USairports)$City[indices]
+
+```
+
+19. ¿Qué vertice/s tiene en su nombre "Wash" (ciudad que empieza por este patrón)?
+
+
+```{r}
+indice <- grep("^Wash", V(USairports)$City)
+V(USairports)$City[indices]
+```
+
+20. ¿Cual es el camino más corto entre "Vegas" y "Wash"?
+
+```{r}
+indice1 <- grep("Vegas",V(USairports)$City)
+indice2 <- grep("Wash",V(USairports)$City)
+
+shortest_paths(USairports,V(USairports)[indice1],V(USairports)[indice2])
+```
+
+21. Calcula las distancias entre todos los aeropuertos. 
+
+```{r}
+distances(USairports)
+```
+
+22. ¿Cuáles son los 10 trayectos con más salidas?
+
+```{r}
+top_tray <- order(E(USairports)$Departures,decreasing = TRUE)[1:10]
+E(USairports)[top_tray]
+```
+
+23. ¿Cual es el trayecto con más plazas? 
+```{r}
+indices <- which.max(E(USairports)$Seats)
+E(USairports)[indices]
+```
+
+24. ¿Cual es el trayecto que mueve más pasajeros? 
+```{r}
+indices <- which.max(E(USairports)$Passengers)
+E(USairports)[indices]
+```
+
+
+
