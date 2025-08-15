@@ -12,10 +12,10 @@ Este repositorio está en proceso de crecimiento y actualización. Actualmente, 
 - `clasificador-pez-payaso-o-tropical`: Proyecto de clasificación de peces tropicales vs. peces payaso.
 - `clasificador_cancer_de_mama`: Proyecto de clasificacion de casos de cáncer de mama vs sanos.
 - `comparación de modelos para estudio de cáncer de mama`: Modelo e informe de análisis comparativo de distintos clasificadores.
-- `spaceship-titanic`: Proyecto de predicción de transporte de pasajeros a otra dimensión usando TFDF y técnicas de ML.
-- `titanic-ml`: Proyecto de predicción de supervivencia de pasajeros del Titanic usando ML clásico.
-- `digit-recognizer`: Proyecto de reconocimiento de dígitos escritos a mano usando CNN en PyTorch.
-- `disaster-tweets-nlp`: Proyecto de clasificación de tweets sobre desastres naturales usando Keras y NLP.
+- `spaceship-titanic-proyecto`: Proyecto de predicción de transporte de pasajeros a otra dimensión usando TFDF y técnicas de ML.
+- `titanic-proyecto`: Proyecto de predicción de supervivencia de pasajeros del Titanic usando ML clásico.
+- `reconocedor-de-digitos`: Proyecto de reconocimiento de dígitos escritos a mano usando CNN en PyTorch.
+- `nlp-para-tweets-de-desastres`: Proyecto de clasificación de tweets sobre desastres naturales usando Keras y NLP.
 
 ### Domótica
 - `sistema_domótico_ardC`: Implementaciones del proyecto Domótica realizadas en C usando arduino.
